@@ -952,4 +952,131 @@ html[lang="en"] .workflow-list .step-desc {
 html[lang="en"] .workflow-list {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
+
+/* ==========================================================================
+   Responsive — Mini (Navbar + Hero) für Tablet und Smartphone
+   ========================================================================== */
+
+/* Tablet: 1024 px und kleiner */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 40px 24px;
+  }
+  .navbar {
+    padding: 0 24px;
+  }
+  .main-title {
+    font-size: 3.2rem;
+    letter-spacing: -1px;
+  }
+  .hero-left {
+    padding-right: 32px;
+  }
+  .hero-logo {
+    max-width: 360px;
+  }
+}
+
+/* Smartphone: 768 px und kleiner */
+@media (max-width: 768px) {
+  /* Navbar — kompakter, mit Wrap */
+  .navbar {
+    height: auto;
+    min-height: 56px;
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .nav-brand {
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+  }
+  .nav-links {
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .github-link {
+    font-size: 0.75rem;
+    gap: 4px;
+  }
+
+  /* Main-Content padding */
+  .main-content {
+    padding: 24px 16px;
+  }
+
+  /* Hero — vom 2-Spalten- auf 1-Spalten-Layout */
+  .hero-section {
+    flex-direction: column;
+    margin-bottom: 48px;
+    gap: 24px;
+  }
+  .hero-left {
+    padding-right: 0;
+    flex: none;
+    width: 100%;
+  }
+  .hero-right {
+    flex: none;
+    width: 100%;
+    align-items: center;
+  }
+  .logo-container {
+    justify-content: center;
+    padding-right: 0;
+  }
+  .hero-logo {
+    max-width: 240px;
+  }
+  .scroll-down-btn {
+    margin-top: 16px;
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Typo skalieren */
+  .main-title {
+    font-size: 2.2rem;
+    letter-spacing: -0.5px;
+    margin-bottom: 24px;
+  }
+  .tag-row {
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .hero-desc {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    text-align: left;
+    margin-bottom: 32px;
+    max-width: 100%;
+  }
+  .slogan-text {
+    font-size: 1rem;
+    padding-left: 12px;
+    letter-spacing: 0.3px;
+  }
+  .decoration-square {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* Sehr kleine Geräte (≤ 380 px) — letzte Reduktion */
+@media (max-width: 380px) {
+  .main-title {
+    font-size: 1.9rem;
+  }
+  .hero-desc {
+    font-size: 0.9rem;
+  }
+  .nav-brand {
+    font-size: 0.9rem;
+  }
+  .github-link {
+    font-size: 0.7rem;
+  }
+}
 </style>
