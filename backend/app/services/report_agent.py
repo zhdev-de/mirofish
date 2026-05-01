@@ -823,7 +823,7 @@ REACT_TOOL_LIMIT_MSG = (
 
 REACT_UNUSED_TOOLS_HINT = "\n💡 Noch nicht genutzt: {unused_list} — empfohlen: andere Tools für unterschiedliche Perspektiven verwenden"
 
-REACT_FORCE_FINAL_MSG = "Tool-Aufruf-Limit erreicht. Bitte direkt mit „Final Answer:" beginnen und den Abschnitts-Inhalt ausgeben."
+REACT_FORCE_FINAL_MSG = 'Tool-Aufruf-Limit erreicht. Bitte direkt mit „Final Answer:" beginnen und den Abschnitts-Inhalt ausgeben.'
 
 # ── Chat-Prompt ──
 
