@@ -55,28 +55,35 @@ onUnmounted(() => {
 .llm-status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border: 1px solid #000;
+  gap: 10px;
+  padding: 10px 16px;
+  border: 2px solid #000;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  letter-spacing: 0.5px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
   cursor: help;
   user-select: none;
+  background: #ffffff;
 }
 
 .dot {
-  width: 8px;
-  height: 8px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   display: inline-block;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
 }
 
 .status-checking .dot { background: #999; animation: pulse 1.2s infinite; }
-.status-green    .dot { background: #2ecc40; }
-.status-yellow   .dot { background: #f5a623; }
-.status-red      .dot { background: #d0021b; }
+.status-green    .dot { background: #2ecc40; box-shadow: 0 0 8px rgba(46, 204, 64, 0.6); }
+.status-yellow   .dot { background: #f5a623; box-shadow: 0 0 8px rgba(245, 166, 35, 0.6); }
+.status-red      .dot { background: #d0021b; box-shadow: 0 0 8px rgba(208, 2, 27, 0.7); }
+
+.status-green    { background: #f4faf4; }
+.status-yellow   { background: #fef6e7; }
+.status-red      { background: #fdecee; }
 
 @keyframes pulse {
   0%, 100% { opacity: 0.4; }
