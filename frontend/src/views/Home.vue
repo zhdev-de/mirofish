@@ -876,24 +876,214 @@ const startSimulation = () => {
   100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
 }
 
-/* 响应式适配 */
+/* ==========================================================================
+   Responsive Layout
+   ========================================================================== */
+
+.home-container {
+  overflow-x: hidden;
+}
+
+/* Tablet (≤ 1024 px) */
 @media (max-width: 1024px) {
-  .dashboard-section {
-    flex-direction: column;
+  .main-content {
+    padding: 40px 24px;
   }
-  
+  .navbar {
+    padding: 0 24px;
+  }
+  .main-title {
+    font-size: 3.2rem;
+    letter-spacing: -1px;
+  }
   .hero-section {
     flex-direction: column;
   }
-  
   .hero-left {
     padding-right: 0;
     margin-bottom: 40px;
   }
-  
   .hero-logo {
-    max-width: 200px;
-    margin-bottom: 20px;
+    max-width: 320px;
+  }
+  .dashboard-section {
+    flex-direction: column;
+    gap: 40px;
+  }
+  .left-panel,
+  .right-panel {
+    flex: 1;
+    width: 100%;
+  }
+}
+
+/* Smartphone (≤ 768 px) */
+@media (max-width: 768px) {
+  /* Navbar */
+  .navbar {
+    height: auto;
+    min-height: 56px;
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .nav-brand {
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+  }
+  .nav-links {
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .github-link {
+    font-size: 0.75rem;
+    gap: 4px;
+  }
+
+  /* Main-Content padding */
+  .main-content {
+    padding: 24px 16px;
+    max-width: 100%;
+  }
+
+  /* Hero */
+  .hero-section {
+    margin-bottom: 40px;
+    gap: 24px;
+  }
+  .hero-left {
+    width: 100%;
+    margin-bottom: 0;
+  }
+  .hero-right {
+    width: 100%;
+    align-items: center;
+  }
+  .logo-container {
+    justify-content: center;
+    padding-right: 0;
+  }
+  .hero-logo {
+    max-width: 220px;
+  }
+  .scroll-down-btn {
+    margin-top: 16px;
+    width: 44px;
+    height: 44px;
+  }
+  .main-title {
+    font-size: 2.2rem;
+    letter-spacing: -0.5px;
+    margin-bottom: 24px;
+  }
+  .tag-row {
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .hero-desc {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    text-align: left;
+    margin-bottom: 32px;
+    max-width: 100%;
+  }
+  .slogan-text {
+    font-size: 1rem;
+    padding-left: 12px;
+    letter-spacing: 0.3px;
+  }
+  .decoration-square {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Dashboard-Section */
+  .dashboard-section {
+    padding-top: 40px;
+    gap: 32px;
+  }
+  .section-title {
+    font-size: 1.5rem;
+  }
+  .section-desc {
+    font-size: 0.95rem;
+  }
+
+  /* Metrics-Karten — von row zu column */
+  .metrics-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .metric-card {
+    min-width: 0;
+    padding: 16px 20px;
+  }
+  .metric-value {
+    font-size: 1.4rem;
+  }
+
+  /* Workflow-Steps */
+  .steps-container {
+    padding: 20px;
+  }
+  .workflow-list {
+    gap: 16px;
+  }
+  .workflow-item {
+    gap: 14px;
+  }
+  .step-title {
+    font-size: 0.95rem;
+  }
+  .step-desc {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  /* Console-Box (Upload + Prompt + Button) */
+  .console-box {
+    padding: 6px;
+  }
+  .console-section {
+    padding: 14px;
+  }
+  .upload-zone {
+    height: 160px;
+  }
+  .code-input {
+    padding: 14px;
+    font-size: 0.85rem;
+    min-height: 120px;
+  }
+  .start-engine-btn {
+    padding: 16px;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+  }
+  .file-item {
+    font-size: 0.78rem;
+    padding: 6px 10px;
+  }
+}
+
+/* Sehr kleine Geräte (≤ 380 px) */
+@media (max-width: 380px) {
+  .main-title {
+    font-size: 1.9rem;
+  }
+  .hero-desc {
+    font-size: 0.9rem;
+  }
+  .nav-brand {
+    font-size: 0.9rem;
+  }
+  .github-link {
+    font-size: 0.7rem;
+  }
+  .section-title {
+    font-size: 1.3rem;
   }
 }
 </style>
@@ -953,130 +1143,4 @@ html[lang="en"] .workflow-list {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* ==========================================================================
-   Responsive — Mini (Navbar + Hero) für Tablet und Smartphone
-   ========================================================================== */
-
-/* Tablet: 1024 px und kleiner */
-@media (max-width: 1024px) {
-  .main-content {
-    padding: 40px 24px;
-  }
-  .navbar {
-    padding: 0 24px;
-  }
-  .main-title {
-    font-size: 3.2rem;
-    letter-spacing: -1px;
-  }
-  .hero-left {
-    padding-right: 32px;
-  }
-  .hero-logo {
-    max-width: 360px;
-  }
-}
-
-/* Smartphone: 768 px und kleiner */
-@media (max-width: 768px) {
-  /* Navbar — kompakter, mit Wrap */
-  .navbar {
-    height: auto;
-    min-height: 56px;
-    padding: 10px 16px;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .nav-brand {
-    font-size: 1rem;
-    letter-spacing: 0.5px;
-  }
-  .nav-links {
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-  .github-link {
-    font-size: 0.75rem;
-    gap: 4px;
-  }
-
-  /* Main-Content padding */
-  .main-content {
-    padding: 24px 16px;
-  }
-
-  /* Hero — vom 2-Spalten- auf 1-Spalten-Layout */
-  .hero-section {
-    flex-direction: column;
-    margin-bottom: 48px;
-    gap: 24px;
-  }
-  .hero-left {
-    padding-right: 0;
-    flex: none;
-    width: 100%;
-  }
-  .hero-right {
-    flex: none;
-    width: 100%;
-    align-items: center;
-  }
-  .logo-container {
-    justify-content: center;
-    padding-right: 0;
-  }
-  .hero-logo {
-    max-width: 240px;
-  }
-  .scroll-down-btn {
-    margin-top: 16px;
-    width: 44px;
-    height: 44px;
-  }
-
-  /* Typo skalieren */
-  .main-title {
-    font-size: 2.2rem;
-    letter-spacing: -0.5px;
-    margin-bottom: 24px;
-  }
-  .tag-row {
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .hero-desc {
-    font-size: 0.95rem;
-    line-height: 1.7;
-    text-align: left;
-    margin-bottom: 32px;
-    max-width: 100%;
-  }
-  .slogan-text {
-    font-size: 1rem;
-    padding-left: 12px;
-    letter-spacing: 0.3px;
-  }
-  .decoration-square {
-    width: 12px;
-    height: 12px;
-  }
-}
-
-/* Sehr kleine Geräte (≤ 380 px) — letzte Reduktion */
-@media (max-width: 380px) {
-  .main-title {
-    font-size: 1.9rem;
-  }
-  .hero-desc {
-    font-size: 0.9rem;
-  }
-  .nav-brand {
-    font-size: 0.9rem;
-  }
-  .github-link {
-    font-size: 0.7rem;
-  }
-}
 </style>
