@@ -32,6 +32,13 @@
   "nav": {
     "visitGithub": "View source on GitHub"
   },
+  "llmStatus": {
+    "checking": "Checking…",
+    "green": "AI available",
+    "yellow": "Status unknown",
+    "red": "Daily limit reached",
+    "lastCheck": "Checked {minutes} min ago"
+  },
   "home": {
     "tagline": "简洁通用的群体智能引擎",
     "version": "/ v0.1-预览版",

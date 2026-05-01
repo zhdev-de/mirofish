@@ -32,6 +32,13 @@
   "nav": {
     "visitGithub": "Quellcode auf GitHub ansehen"
   },
+  "llmStatus": {
+    "checking": "Prüfe…",
+    "green": "KI verfügbar",
+    "yellow": "Status unklar",
+    "red": "Tageslimit erreicht",
+    "lastCheck": "Geprüft vor {minutes} Min."
+  },
   "home": {
     "tagline": "Kompakte und universelle Schwarm-Intelligenz-Engine",
     "version": "/ v0.1-Preview",

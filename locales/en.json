@@ -32,6 +32,13 @@
   "nav": {
     "visitGithub": "View source on GitHub"
   },
+  "llmStatus": {
+    "checking": "Checking…",
+    "green": "AI available",
+    "yellow": "Status unknown",
+    "red": "Daily limit reached",
+    "lastCheck": "Checked {minutes} min ago"
+  },
   "home": {
     "tagline": "Concise & Universal Swarm Intelligence Engine",
     "version": "/ v0.1-Preview",
