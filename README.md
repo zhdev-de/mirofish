@@ -1,3 +1,9 @@
+> **zhdev fork notice** — This is `zhdev-de/mirofish`, a fork of [666ghj/MiroFish](https://github.com/666ghj/MiroFish) deployed at https://mirofish.zhdev.de. UI is rebranded as **zhdev Predict**; the engine is unmodified. Source for the deployed instance: this repository (AGPL-3.0). See [NOTICE.md](./NOTICE.md).
+>
+> Original README follows.
+
+---
+
 <div align="center">
 
 <img src="./static/image/MiroFish_logo_compressed.jpeg" alt="MiroFish Logo" width="75%"/>
