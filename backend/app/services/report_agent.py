@@ -1531,6 +1531,36 @@ class ReportAgent:
         return final_answer
 
     @staticmethod
+    def _load_existing_outline(report_id: str) -> Optional["ReportOutline"]:
+        """
+        Lädt eine bereits gespeicherte Outline vom Disk, damit ein resumeter Lauf
+        die ursprüngliche Section-Struktur wiederverwendet (statt eine abweichende
+        Outline neu zu planen, was die per Index gematchten Section-Files verfälscht).
+
+        Gibt None zurück, wenn keine valide Outline existiert.
+        """
+        path = ReportManager._get_outline_path(report_id)
+        if not os.path.exists(path):
+            return None
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            sections = [
+                ReportSection(title=s.get('title', ''), content=s.get('content', ''))
+                for s in data.get('sections', [])
+            ]
+            if not sections:
+                return None
+            return ReportOutline(
+                title=data.get('title', ''),
+                summary=data.get('summary', ''),
+                sections=sections,
+            )
+        except Exception as e:
+            logger.warning(f"Outline für {report_id} unlesbar, plane neu: {e}")
+            return None
+
+    @staticmethod
     def _load_existing_section(report_id: str, section_index: int) -> Optional[str]:
         """
         Lädt den Body einer bereits gespeicherten Sektion vom Disk, um nach einem
@@ -1640,16 +1670,24 @@ class ReportAgent:
             if progress_callback:
                 progress_callback("planning", 0, t('progress.startPlanningOutline'))
             
-            outline = self.plan_outline(
-                progress_callback=lambda stage, prog, msg: 
-                    progress_callback(stage, prog // 5, msg) if progress_callback else None
-            )
+            outline = self._load_existing_outline(report_id)
+            if outline is not None:
+                logger.info(
+                    f"Resume: Outline aus existierender Datei wiederverwendet "
+                    f"({len(outline.sections)} Sektionen)"
+                )
+            else:
+                outline = self.plan_outline(
+                    progress_callback=lambda stage, prog, msg:
+                        progress_callback(stage, prog // 5, msg) if progress_callback else None
+                )
+
             report.outline = outline
-            
+
             # 记录规划完成日志
             self.report_logger.log_planning_complete(outline.to_dict())
-            
-            # 保存大纲到文件
+
+            # 保存大纲到文件 (idempotent — bei Resume wird derselbe Inhalt zurückgeschrieben)
             ReportManager.save_outline(report_id, outline)
             ReportManager.update_progress(
                 report_id, "planning", 15, t('progress.outlineDone', count=len(outline.sections)),
