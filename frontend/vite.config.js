@@ -13,7 +13,9 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true,
+    open: false,
+    host: true,
+    allowedHosts: ['.zhdev.de', 'localhost'],
     proxy: {
       '/api': {
         target: 'http://localhost:5001',
