@@ -1529,9 +1529,70 @@ class ReportAgent:
             )
         
         return final_answer
-    
+
+    @staticmethod
+    def _load_existing_outline(report_id: str) -> Optional["ReportOutline"]:
+        """
+        Lädt eine bereits gespeicherte Outline vom Disk, damit ein resumeter Lauf
+        die ursprüngliche Section-Struktur wiederverwendet (statt eine abweichende
+        Outline neu zu planen, was die per Index gematchten Section-Files verfälscht).
+
+        Gibt None zurück, wenn keine valide Outline existiert.
+        """
+        path = ReportManager._get_outline_path(report_id)
+        if not os.path.exists(path):
+            return None
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            sections = [
+                ReportSection(title=s.get('title', ''), content=s.get('content', ''))
+                for s in data.get('sections', [])
+            ]
+            if not sections:
+                return None
+            return ReportOutline(
+                title=data.get('title', ''),
+                summary=data.get('summary', ''),
+                sections=sections,
+            )
+        except Exception as e:
+            logger.warning(f"Outline für {report_id} unlesbar, plane neu: {e}")
+            return None
+
+    @staticmethod
+    def _load_existing_section(report_id: str, section_index: int) -> Optional[str]:
+        """
+        Lädt den Body einer bereits gespeicherten Sektion vom Disk, um nach einem
+        Fehlschlag nur die fehlenden Sektionen neu zu generieren.
+
+        save_section() schreibt das Format "## <title>\\n\\n<body>\\n\\n" — wir geben
+        nur den Body zurück, damit der Aufrufer ihn wie ein frisch generiertes Ergebnis
+        weiterverarbeiten kann.
+
+        Gibt None zurück, wenn keine valide Datei existiert.
+        """
+        path = ReportManager._get_section_path(report_id, section_index)
+        if not os.path.exists(path):
+            return None
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                saved = f.read().strip()
+        except Exception as e:
+            logger.warning(f"Section {section_index:02d} unlesbar, generiere neu: {e}")
+            return None
+
+        # Schutz vor halb-geschriebenen Dateien aus abgebrochenen Runs
+        if len(saved) < 100:
+            return None
+
+        lines = saved.split('\n', 2)
+        if len(lines) >= 3 and lines[0].startswith('## ') and lines[1] == '':
+            return lines[2].strip()
+        return saved
+
     def generate_report(
-        self, 
+        self,
         progress_callback: Optional[Callable[[str, int, str], None]] = None,
         report_id: Optional[str] = None
     ) -> Report:
@@ -1609,16 +1670,24 @@ class ReportAgent:
             if progress_callback:
                 progress_callback("planning", 0, t('progress.startPlanningOutline'))
             
-            outline = self.plan_outline(
-                progress_callback=lambda stage, prog, msg: 
-                    progress_callback(stage, prog // 5, msg) if progress_callback else None
-            )
+            outline = self._load_existing_outline(report_id)
+            if outline is not None:
+                logger.info(
+                    f"Resume: Outline aus existierender Datei wiederverwendet "
+                    f"({len(outline.sections)} Sektionen)"
+                )
+            else:
+                outline = self.plan_outline(
+                    progress_callback=lambda stage, prog, msg:
+                        progress_callback(stage, prog // 5, msg) if progress_callback else None
+                )
+
             report.outline = outline
-            
+
             # 记录规划完成日志
             self.report_logger.log_planning_complete(outline.to_dict())
-            
-            # 保存大纲到文件
+
+            # 保存大纲到文件 (idempotent — bei Resume wird derselbe Inhalt zurückgeschrieben)
             ReportManager.save_outline(report_id, outline)
             ReportManager.update_progress(
                 report_id, "planning", 15, t('progress.outlineDone', count=len(outline.sections)),
@@ -1652,20 +1721,29 @@ class ReportAgent:
                         base_progress,
                         t('progress.generatingSection', title=section.title, current=section_num, total=total_sections)
                     )
-                
-                # 生成主章节内容
-                section_content = self._generate_section_react(
-                    section=section,
-                    outline=outline,
-                    previous_sections=generated_sections,
-                    progress_callback=lambda stage, prog, msg:
-                        progress_callback(
-                            stage, 
-                            base_progress + int(prog * 0.7 / total_sections),
-                            msg
-                        ) if progress_callback else None,
-                    section_index=section_num
-                )
+
+                # Section-Resume: existierende Datei aus früherem Lauf wiederverwenden
+                section_content = self._load_existing_section(report_id, section_num)
+
+                if section_content is None:
+                    # 生成主章节内容
+                    section_content = self._generate_section_react(
+                        section=section,
+                        outline=outline,
+                        previous_sections=generated_sections,
+                        progress_callback=lambda stage, prog, msg:
+                            progress_callback(
+                                stage,
+                                base_progress + int(prog * 0.7 / total_sections),
+                                msg
+                            ) if progress_callback else None,
+                        section_index=section_num
+                    )
+                else:
+                    logger.info(
+                        f"Resume: Section {section_num:02d} aus existierender Datei "
+                        f"wiederverwendet ({len(section_content)} Zeichen)"
+                    )
                 
                 section.content = section_content
                 generated_sections.append(f"## {section.title}\n\n{section_content}")
