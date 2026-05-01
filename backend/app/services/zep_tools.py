@@ -1101,23 +1101,23 @@ class ZepToolsService:
         
         将复杂问题分解为多个可以独立检索的子问题
         """
-        system_prompt = """你是一个专业的问题分析专家。你的任务是将一个复杂问题分解为多个可以在模拟世界中独立观察的子问题。
+        system_prompt = """Du bist Expertin/Experte für Fragen-Analyse. Deine Aufgabe ist es, eine komplexe Frage in mehrere Unterfragen zu zerlegen, die jeweils unabhängig in der Simulationswelt beobachtbar sind.
 
-要求：
-1. 每个子问题应该足够具体，可以在模拟世界中找到相关的Agent行为或事件
-2. 子问题应该覆盖原问题的不同维度（如：谁、什么、为什么、怎么样、何时、何地）
-3. 子问题应该与模拟场景相关
-4. 返回JSON格式：{"sub_queries": ["子问题1", "子问题2", ...]}"""
+Anforderungen:
+1. Jede Unterfrage muss spezifisch genug sein, um zugehörige Agenten-Handlungen oder Ereignisse in der Simulationswelt zu finden
+2. Die Unterfragen sollen verschiedene Dimensionen der Ausgangs-Frage abdecken (wer, was, warum, wie, wann, wo)
+3. Die Unterfragen müssen zum Simulations-Szenario passen
+4. JSON-Format zurückgeben: {"sub_queries": ["Unterfrage 1", "Unterfrage 2", ...]}"""
 
-        user_prompt = f"""模拟需求背景：
+        user_prompt = f"""Hintergrund Simulations-Anforderung:
 {simulation_requirement}
 
-{f"报告上下文：{report_context[:500]}" if report_context else ""}
+{f"Berichts-Kontext: {report_context[:500]}" if report_context else ""}
 
-请将以下问题分解为{max_queries}个子问题：
+Zerlege die folgende Frage in {max_queries} Unterfragen:
 {query}
 
-返回JSON格式的子问题列表。"""
+Gib die Liste der Unterfragen als JSON zurück."""
 
         try:
             response = self.llm.chat_json(
@@ -1577,30 +1577,30 @@ class ZepToolsService:
             }
             agent_summaries.append(summary)
         
-        system_prompt = """你是一个专业的采访策划专家。你的任务是根据采访需求，从模拟Agent列表中选择最适合采访的对象。
+        system_prompt = """Du bist Expertin/Experte für Interview-Planung. Deine Aufgabe ist es, basierend auf der Interview-Anforderung aus der Liste der simulierten Agenten die geeignetsten Interviewpartner auszuwählen.
 
-选择标准：
-1. Agent的身份/职业与采访主题相关
-2. Agent可能持有独特或有价值的观点
-3. 选择多样化的视角（如：支持方、反对方、中立方、专业人士等）
-4. 优先选择与事件直接相关的角色
+Auswahl-Kriterien:
+1. Identität/Beruf des Agenten passt zum Interview-Thema
+2. Der Agent vertritt möglicherweise eine eigenständige oder wertvolle Sicht
+3. Vielfältige Perspektiven berücksichtigen (Befürworter, Gegner, Neutrale, Fachleute usw.)
+4. Vorrangig Rollen wählen, die einen direkten Bezug zum Ereignis haben
 
-返回JSON格式：
+JSON-Format zurückgeben:
 {
-    "selected_indices": [选中Agent的索引列表],
-    "reasoning": "选择理由说明"
+    "selected_indices": [Indizes der ausgewählten Agenten],
+    "reasoning": "Begründung der Auswahl"
 }"""
 
-        user_prompt = f"""采访需求：
+        user_prompt = f"""Interview-Anforderung:
 {interview_requirement}
 
-模拟背景：
-{simulation_requirement if simulation_requirement else "未提供"}
+Simulations-Hintergrund:
+{simulation_requirement if simulation_requirement else "nicht angegeben"}
 
-可选择的Agent列表（共{len(agent_summaries)}个）：
+Auswählbare Agenten ({len(agent_summaries)} insgesamt):
 {json.dumps(agent_summaries, ensure_ascii=False, indent=2)}
 
-请选择最多{max_agents}个最适合采访的Agent，并说明选择理由。"""
+Wähle bis zu {max_agents} Agenten, die für das Interview am besten geeignet sind, und begründe die Auswahl."""
 
         try:
             response = self.llm.chat_json(
@@ -1641,25 +1641,25 @@ class ZepToolsService:
         
         agent_roles = [a.get("profession", "未知") for a in selected_agents]
         
-        system_prompt = """你是一个专业的记者/采访者。根据采访需求，生成3-5个深度采访问题。
+        system_prompt = """Du bist Journalist/in bzw. Interviewer/in. Erzeuge auf Basis der Interview-Anforderung 3–5 vertiefende Interview-Fragen.
 
-问题要求：
-1. 开放性问题，鼓励详细回答
-2. 针对不同角色可能有不同答案
-3. 涵盖事实、观点、感受等多个维度
-4. 语言自然，像真实采访一样
-5. 每个问题控制在50字以内，简洁明了
-6. 直接提问，不要包含背景说明或前缀
+Anforderungen:
+1. Offene Fragen, die ausführliche Antworten anregen
+2. Fragen, die je nach Rolle unterschiedlich beantwortet werden können
+3. Decken Fakten, Meinungen, Empfindungen und weitere Dimensionen ab
+4. Natürliche Formulierung, wie ein echtes Interview
+5. Jede Frage maximal ca. 200 Zeichen, knapp und klar
+6. Direkt fragen — keine Hintergrund-Erklärung oder Präfix
 
-返回JSON格式：{"questions": ["问题1", "问题2", ...]}"""
+JSON-Format: {"questions": ["Frage 1", "Frage 2", ...]}"""
 
-        user_prompt = f"""采访需求：{interview_requirement}
+        user_prompt = f"""Interview-Anforderung: {interview_requirement}
 
-模拟背景：{simulation_requirement if simulation_requirement else "未提供"}
+Simulations-Hintergrund: {simulation_requirement if simulation_requirement else "nicht angegeben"}
 
-采访对象角色：{', '.join(agent_roles)}
+Rollen der Interviewpartner: {', '.join(agent_roles)}
 
-请生成3-5个采访问题。"""
+Erzeuge 3–5 Interview-Fragen."""
 
         try:
             response = self.llm.chat_json(
@@ -1695,29 +1695,29 @@ class ZepToolsService:
         for interview in interviews:
             interview_texts.append(f"【{interview.agent_name}（{interview.agent_role}）】\n{interview.response[:500]}")
         
-        quote_instruction = "引用受访者原话时使用中文引号「」" if get_locale() == 'zh' else 'Use quotation marks "" when quoting interviewees'
-        system_prompt = f"""你是一个专业的新闻编辑。请根据多位受访者的回答，生成一份采访摘要。
+        quote_instruction = "引用受访者原话时使用中文引号「」" if get_locale() == 'zh' else 'Beim Zitieren von Interviewpartnern doppelte Anführungszeichen „..." verwenden'
+        system_prompt = f"""Du bist News-Redakteur/in. Erzeuge auf Basis der Antworten mehrerer Interviewpartner eine Interview-Zusammenfassung.
 
-摘要要求：
-1. 提炼各方主要观点
-2. 指出观点的共识和分歧
-3. 突出有价值的引言
-4. 客观中立，不偏袒任何一方
-5. 控制在1000字内
+Anforderungen:
+1. Hauptaussagen aller Beteiligten verdichten
+2. Konsens und Differenzen sichtbar machen
+3. Wertvolle Originalzitate herausstellen
+4. Objektiv und neutral, keine Seite bevorzugen
+5. Maximal ca. 1000 Wörter
 
-格式约束（必须遵守）：
-- 使用纯文本段落，用空行分隔不同部分
-- 不要使用Markdown标题（如#、##、###）
-- 不要使用分割线（如---、***）
+Format-Regeln (verbindlich):
+- Reine Text-Absätze, mit Leerzeile zwischen Abschnitten getrennt
+- Keine Markdown-Überschriften (kein #, ##, ###)
+- Keine Trennlinien (kein ---, ***)
 - {quote_instruction}
-- 可以使用**加粗**标记关键词，但不要使用其他Markdown语法"""
+- **Fettdruck** für Schlüsselwörter ist erlaubt, sonst keine Markdown-Syntax"""
 
-        user_prompt = f"""采访主题：{interview_requirement}
+        user_prompt = f"""Interview-Thema: {interview_requirement}
 
-采访内容：
+Interview-Inhalt:
 {"".join(interview_texts)}
 
-请生成采访摘要。"""
+Erzeuge die Interview-Zusammenfassung."""
 
         try:
             summary = self.llm.chat(
