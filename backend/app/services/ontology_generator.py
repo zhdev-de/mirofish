@@ -27,149 +27,149 @@ def _to_pascal_case(name: str) -> str:
 
 
 # 本体生成的系统提示词
-ONTOLOGY_SYSTEM_PROMPT = """你是一个专业的知识图谱本体设计专家。你的任务是分析给定的文本内容和模拟需求，设计适合**社交媒体舆论模拟**的实体类型和关系类型。
+ONTOLOGY_SYSTEM_PROMPT = """Du bist Expertin/Experte für die Gestaltung von Knowledge-Graph-Ontologien. Deine Aufgabe ist es, den gegebenen Text und die Simulations-Anforderung zu analysieren und passende Entitäts- und Beziehungstypen für eine **Social-Media-Meinungs-Simulation** zu entwerfen.
 
-**重要：你必须输出有效的JSON格式数据，不要输出任何其他内容。**
+**Wichtig: Du musst gültiges JSON ausgeben — sonst nichts.**
 
-## 核心任务背景
+## Hintergrund
 
-我们正在构建一个**社交媒体舆论模拟系统**。在这个系统中：
-- 每个实体都是一个可以在社交媒体上发声、互动、传播信息的"账号"或"主体"
-- 实体之间会相互影响、转发、评论、回应
-- 我们需要模拟舆论事件中各方的反应和信息传播路径
+Wir bauen ein **Social-Media-Meinungs-Simulationssystem**. In diesem System gilt:
+- Jede Entität ist ein „Account" oder „Subjekt", das auf Social Media Stimme erheben, interagieren und Informationen verbreiten kann
+- Entitäten beeinflussen sich gegenseitig, teilen Beiträge, kommentieren und antworten
+- Wir simulieren die Reaktionen verschiedener Beteiligter und Informations-Verbreitungspfade in Meinungs-Ereignissen
 
-因此，**实体必须是现实中真实存在的、可以在社媒上发声和互动的主体**：
+Daher müssen **Entitäten reale, auf Social Media handlungsfähige Subjekte** sein:
 
-**可以是**：
-- 具体的个人（公众人物、当事人、意见领袖、专家学者、普通人）
-- 公司、企业（包括其官方账号）
-- 组织机构（大学、协会、NGO、工会等）
-- 政府部门、监管机构
-- 媒体机构（报纸、电视台、自媒体、网站）
-- 社交媒体平台本身
-- 特定群体代表（如校友会、粉丝团、维权群体等）
+**Erlaubt sind**:
+- Konkrete Einzelpersonen (Persönlichkeiten, Betroffene, Meinungsführer, Fachleute, Privatpersonen)
+- Unternehmen (inkl. ihrer offiziellen Accounts)
+- Organisationen (Hochschulen, Verbände, NGOs, Gewerkschaften usw.)
+- Regierungsbehörden, Aufsichtsbehörden
+- Medienorganisationen (Zeitungen, TV-Sender, Self-Media, Webseiten)
+- Social-Media-Plattformen selbst
+- Repräsentanten spezifischer Gruppen (Alumni-Verein, Fan-Gemeinde, Aktivisten-Gruppe usw.)
 
-**不可以是**：
-- 抽象概念（如"舆论"、"情绪"、"趋势"）
-- 主题/话题（如"学术诚信"、"教育改革"）
-- 观点/态度（如"支持方"、"反对方"）
+**Nicht erlaubt sind**:
+- Abstrakte Konzepte (z. B. „öffentliche Meinung", „Stimmung", „Trend")
+- Themen (z. B. „Wissenschafts-Integrität", „Bildungsreform")
+- Standpunkte/Haltungen (z. B. „Befürworter", „Gegner")
 
-## 输出格式
+## Ausgabe-Format
 
-请输出JSON格式，包含以下结构：
+Gib JSON in folgender Struktur aus:
 
 ```json
 {
     "entity_types": [
         {
-            "name": "实体类型名称（英文，PascalCase）",
-            "description": "简短描述（英文，不超过100字符）",
+            "name": "Name des Entitätstyps (Englisch, PascalCase)",
+            "description": "Kurze Beschreibung (Englisch, max. 100 Zeichen)",
             "attributes": [
                 {
-                    "name": "属性名（英文，snake_case）",
+                    "name": "Attribut-Name (Englisch, snake_case)",
                     "type": "text",
-                    "description": "属性描述"
+                    "description": "Beschreibung des Attributs"
                 }
             ],
-            "examples": ["示例实体1", "示例实体2"]
+            "examples": ["Beispiel-Entität 1", "Beispiel-Entität 2"]
         }
     ],
     "edge_types": [
         {
-            "name": "关系类型名称（英文，UPPER_SNAKE_CASE）",
-            "description": "简短描述（英文，不超过100字符）",
+            "name": "Name des Beziehungstyps (Englisch, UPPER_SNAKE_CASE)",
+            "description": "Kurze Beschreibung (Englisch, max. 100 Zeichen)",
             "source_targets": [
-                {"source": "源实体类型", "target": "目标实体类型"}
+                {"source": "Quell-Entitätstyp", "target": "Ziel-Entitätstyp"}
             ],
             "attributes": []
         }
     ],
-    "analysis_summary": "对文本内容的简要分析说明"
+    "analysis_summary": "Kurze Analyse des Text-Inhalts"
 }
 ```
 
-## 设计指南（极其重要！）
+## Design-Leitlinien (sehr wichtig!)
 
-### 1. 实体类型设计 - 必须严格遵守
+### 1. Entitätstyp-Design — verbindlich
 
-**数量要求：必须正好10个实体类型**
+**Anzahl: genau 10 Entitätstypen.**
 
-**层次结构要求（必须同时包含具体类型和兜底类型）**：
+**Hierarchie (konkrete Typen UND Auffang-Typen müssen enthalten sein):**
 
-你的10个实体类型必须包含以下层次：
+Deine 10 Entitätstypen müssen folgende Hierarchie abbilden:
 
-A. **兜底类型（必须包含，放在列表最后2个）**：
-   - `Person`: 任何自然人个体的兜底类型。当一个人不属于其他更具体的人物类型时，归入此类。
-   - `Organization`: 任何组织机构的兜底类型。当一个组织不属于其他更具体的组织类型时，归入此类。
+A. **Auffang-Typen (Pflicht, an den letzten 2 Plätzen der Liste)**:
+   - `Person`: Auffang-Typ für jede natürliche Person. Wenn ein Mensch zu keinem konkreteren Personen-Typ passt, gehört er hierher.
+   - `Organization`: Auffang-Typ für jede Organisation. Wenn eine Organisation zu keinem konkreteren Organisations-Typ passt, gehört sie hierher.
 
-B. **具体类型（8个，根据文本内容设计）**：
-   - 针对文本中出现的主要角色，设计更具体的类型
-   - 例如：如果文本涉及学术事件，可以有 `Student`, `Professor`, `University`
-   - 例如：如果文本涉及商业事件，可以有 `Company`, `CEO`, `Employee`
+B. **Konkrete Typen (8, basierend auf dem Text-Inhalt)**:
+   - Konkretere Typen für die wichtigsten Rollen im Text
+   - Beispiel: Bei einem akademischen Ereignis evtl. `Student`, `Professor`, `University`
+   - Beispiel: Bei einem Wirtschafts-Ereignis evtl. `Company`, `CEO`, `Employee`
 
-**为什么需要兜底类型**：
-- 文本中会出现各种人物，如"中小学教师"、"路人甲"、"某位网友"
-- 如果没有专门的类型匹配，他们应该被归入 `Person`
-- 同理，小型组织、临时团体等应该归入 `Organization`
+**Warum Auffang-Typen nötig sind**:
+- Im Text tauchen vielfältige Personen auf, z. B. „Schullehrer", „Passant", „ein Internet-User"
+- Ohne passenden konkreten Typ werden sie als `Person` klassifiziert
+- Analog werden kleine oder temporäre Gruppen unter `Organization` gefasst
 
-**具体类型的设计原则**：
-- 从文本中识别出高频出现或关键的角色类型
-- 每个具体类型应该有明确的边界，避免重叠
-- description 必须清晰说明这个类型和兜底类型的区别
+**Design-Prinzipien für konkrete Typen**:
+- Identifiziere die im Text häufig vorkommenden oder zentralen Rollen
+- Jeder konkrete Typ braucht klare Abgrenzung — keine Überschneidungen
+- description muss klar machen, wie dieser Typ sich vom Auffang-Typ unterscheidet
 
-### 2. 关系类型设计
+### 2. Beziehungstyp-Design
 
-- 数量：6-10个
-- 关系应该反映社媒互动中的真实联系
-- 确保关系的 source_targets 涵盖你定义的实体类型
+- Anzahl: 6–10
+- Beziehungen sollen reale Social-Media-Interaktionen abbilden
+- source_targets der Beziehungen müssen die definierten Entitätstypen abdecken
 
-### 3. 属性设计
+### 3. Attribut-Design
 
-- 每个实体类型1-3个关键属性
-- **注意**：属性名不能使用 `name`、`uuid`、`group_id`、`created_at`、`summary`（这些是系统保留字）
-- 推荐使用：`full_name`, `title`, `role`, `position`, `location`, `description` 等
+- Pro Entitätstyp 1–3 Schlüssel-Attribute
+- **Achtung**: Attribut-Namen dürfen NICHT `name`, `uuid`, `group_id`, `created_at`, `summary` heißen (System-reservierte Wörter)
+- Empfohlen: `full_name`, `title`, `role`, `position`, `location`, `description` etc.
 
-## 实体类型参考
+## Referenz-Entitätstypen
 
-**个人类（具体）**：
-- Student: 学生
-- Professor: 教授/学者
-- Journalist: 记者
-- Celebrity: 明星/网红
-- Executive: 高管
-- Official: 政府官员
-- Lawyer: 律师
-- Doctor: 医生
+**Personen (konkret)**:
+- Student: Studierende/r
+- Professor: Professor/Wissenschaftler
+- Journalist: Journalist
+- Celebrity: Promi/Influencer
+- Executive: Führungskraft
+- Official: Regierungsbeamte/r
+- Lawyer: Anwalt/Anwältin
+- Doctor: Arzt/Ärztin
 
-**个人类（兜底）**：
-- Person: 任何自然人（不属于上述具体类型时使用）
+**Personen (Auffang)**:
+- Person: jede natürliche Person (wenn kein konkreter Typ passt)
 
-**组织类（具体）**：
-- University: 高校
-- Company: 公司企业
-- GovernmentAgency: 政府机构
-- MediaOutlet: 媒体机构
-- Hospital: 医院
-- School: 中小学
-- NGO: 非政府组织
+**Organisationen (konkret)**:
+- University: Hochschule
+- Company: Unternehmen
+- GovernmentAgency: Regierungsbehörde
+- MediaOutlet: Medienorganisation
+- Hospital: Krankenhaus
+- School: Schule
+- NGO: Nichtregierungsorganisation
 
-**组织类（兜底）**：
-- Organization: 任何组织机构（不属于上述具体类型时使用）
+**Organisationen (Auffang)**:
+- Organization: jede Organisation (wenn kein konkreter Typ passt)
 
-## 关系类型参考
+## Referenz-Beziehungstypen
 
-- WORKS_FOR: 工作于
-- STUDIES_AT: 就读于
-- AFFILIATED_WITH: 隶属于
-- REPRESENTS: 代表
-- REGULATES: 监管
-- REPORTS_ON: 报道
-- COMMENTS_ON: 评论
-- RESPONDS_TO: 回应
-- SUPPORTS: 支持
-- OPPOSES: 反对
-- COLLABORATES_WITH: 合作
-- COMPETES_WITH: 竞争
+- WORKS_FOR: arbeitet bei
+- STUDIES_AT: studiert an
+- AFFILIATED_WITH: zugehörig zu
+- REPRESENTS: repräsentiert
+- REGULATES: reguliert
+- REPORTS_ON: berichtet über
+- COMMENTS_ON: kommentiert
+- RESPONDS_TO: antwortet auf
+- SUPPORTS: unterstützt
+- OPPOSES: lehnt ab
+- COLLABORATES_WITH: kooperiert mit
+- COMPETES_WITH: konkurriert mit
 """
 
 
@@ -236,40 +236,38 @@ class OntologyGenerator:
     ) -> str:
         """构建用户消息"""
         
-        # 合并文本
         combined_text = "\n\n---\n\n".join(document_texts)
         original_length = len(combined_text)
-        
-        # 如果文本超过5万字，截断（仅影响传给LLM的内容，不影响图谱构建）
+
         if len(combined_text) > self.MAX_TEXT_LENGTH_FOR_LLM:
             combined_text = combined_text[:self.MAX_TEXT_LENGTH_FOR_LLM]
-            combined_text += f"\n\n...(原文共{original_length}字，已截取前{self.MAX_TEXT_LENGTH_FOR_LLM}字用于本体分析)..."
-        
-        message = f"""## 模拟需求
+            combined_text += f"\n\n...(Original umfasst {original_length} Zeichen; die ersten {self.MAX_TEXT_LENGTH_FOR_LLM} wurden für die Ontologie-Analyse verwendet)..."
+
+        message = f"""## Simulations-Anforderung
 
 {simulation_requirement}
 
-## 文档内容
+## Dokument-Inhalt
 
 {combined_text}
 """
-        
+
         if additional_context:
             message += f"""
-## 额外说明
+## Zusätzliche Hinweise
 
 {additional_context}
 """
-        
-        message += """
-请根据以上内容，设计适合社会舆论模拟的实体类型和关系类型。
 
-**必须遵守的规则**：
-1. 必须正好输出10个实体类型
-2. 最后2个必须是兜底类型：Person（个人兜底）和 Organization（组织兜底）
-3. 前8个是根据文本内容设计的具体类型
-4. 所有实体类型必须是现实中可以发声的主体，不能是抽象概念
-5. 属性名不能使用 name、uuid、group_id 等保留字，用 full_name、org_name 等替代
+        message += """
+Entwirf auf Basis der obigen Inhalte passende Entitäts- und Beziehungstypen für die Social-Media-Meinungs-Simulation.
+
+**Verbindliche Regeln**:
+1. Es müssen genau 10 Entitätstypen ausgegeben werden
+2. Die letzten 2 müssen die Auffang-Typen sein: Person (Auffang für Personen) und Organization (Auffang für Organisationen)
+3. Die ersten 8 sind konkrete Typen, abgeleitet aus dem Text-Inhalt
+4. Alle Entitätstypen müssen reale, in der Öffentlichkeit handlungsfähige Subjekte sein, keine abstrakten Konzepte
+5. Attribut-Namen dürfen nicht name, uuid, group_id usw. (System-reserviert) verwenden — stattdessen full_name, org_name etc.
 """
         
         return message
