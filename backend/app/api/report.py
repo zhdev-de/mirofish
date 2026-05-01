@@ -70,19 +70,18 @@ def generate_report():
             }), 404
 
         # 检查是否已有报告
-        if not force_regenerate:
-            existing_report = ReportManager.get_report_by_simulation(simulation_id)
-            if existing_report and existing_report.status == ReportStatus.COMPLETED:
-                return jsonify({
-                    "success": True,
-                    "data": {
-                        "simulation_id": simulation_id,
-                        "report_id": existing_report.report_id,
-                        "status": "completed",
-                        "message": t('api.reportAlreadyExists'),
-                        "already_generated": True
-                    }
-                })
+        existing_report = ReportManager.get_report_by_simulation(simulation_id)
+        if not force_regenerate and existing_report and existing_report.status == ReportStatus.COMPLETED:
+            return jsonify({
+                "success": True,
+                "data": {
+                    "simulation_id": simulation_id,
+                    "report_id": existing_report.report_id,
+                    "status": "completed",
+                    "message": t('api.reportAlreadyExists'),
+                    "already_generated": True
+                }
+            })
         
         # 获取项目信息
         project = ProjectManager.get_project(state.project_id)
@@ -106,9 +105,15 @@ def generate_report():
                 "error": t('api.missingSimRequirement')
             }), 400
         
-        # 提前生成 report_id，以便立即返回给前端
+        # Report-ID festlegen: nicht-abgeschlossene Reports werden für Section-Resume wiederverwendet
         import uuid
-        report_id = f"report_{uuid.uuid4().hex[:12]}"
+        if existing_report and existing_report.status != ReportStatus.COMPLETED:
+            report_id = existing_report.report_id
+            logger.info(
+                f"Resume: Report {report_id} (Status {existing_report.status.value}) wird fortgesetzt"
+            )
+        else:
+            report_id = f"report_{uuid.uuid4().hex[:12]}"
         
         # 创建异步任务
         task_manager = TaskManager()
