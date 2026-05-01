@@ -12,3 +12,4 @@ services:
     restart: unless-stopped
     volumes:
       - ./backend/uploads:/app/backend/uploads
+      - ./frontend/vite.config.js:/app/frontend/vite.config.js:ro
